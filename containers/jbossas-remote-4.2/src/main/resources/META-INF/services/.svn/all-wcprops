@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repos/common/!svn/ver/4523/arquillian/trunk/containers/jbossas-remote-50/src/main/resources/META-INF/services
+END
+org.jboss.arquillian.spi.DeployableContainer
+K 25
+svn:wc:ra_dav:version-url
+V 155
+/repos/common/!svn/ver/4523/arquillian/trunk/containers/jbossas-remote-50/src/main/resources/META-INF/services/org.jboss.arquillian.spi.DeployableContainer
+END
+org.jboss.arquillian.spi.AuxiliaryArchiveAppender
+K 25
+svn:wc:ra_dav:version-url
+V 160
+/repos/common/!svn/ver/4523/arquillian/trunk/containers/jbossas-remote-50/src/main/resources/META-INF/services/org.jboss.arquillian.spi.AuxiliaryArchiveAppender
+END
+org.jboss.arquillian.spi.ContainerConfiguration
+K 25
+svn:wc:ra_dav:version-url
+V 158
+/repos/common/!svn/ver/4523/arquillian/trunk/containers/jbossas-remote-50/src/main/resources/META-INF/services/org.jboss.arquillian.spi.ContainerConfiguration
+END
