@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.protocol.servlet_2_5;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
@@ -23,12 +24,12 @@ import java.net.URL;
 /**
  * TestUtil
  * 
- * Internal helper for testcase to do http request
+ * Internal helper for testcase to do stuff...
  *
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-class TestUtil
+final class TestUtil
 {
    private TestUtil() {}
 
@@ -64,5 +65,18 @@ class TestUtil
       {
          // ignore
       }
+   }
+   
+   public static String convertToString(InputStream in) throws Exception
+   {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      int b;
+      while ((b = in.read()) != -1)
+      {
+         out.write(b);
+      }
+      out.close();
+      in.close();
+      return new String(out.toByteArray(), "UTF-8");
    }
 }
