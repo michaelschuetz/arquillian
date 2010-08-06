@@ -20,19 +20,15 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.net.URL;
 
-import org.jboss.arquillian.protocol.servlet_2_5.ServletMethodExecutor;
-import org.jboss.arquillian.protocol.servlet_2_5.ServletTestRunner;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestResult.Status;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
-
 
 /**
  * ProtocolTestCase
@@ -40,7 +36,6 @@ import org.mortbay.jetty.servlet.Context;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-@Ignore // need to fix the javaee api dep
 public class ProtocolTestCase 
 {
 
@@ -71,7 +66,7 @@ public class ProtocolTestCase
       
       Assert.assertEquals(
             "Should have returned a passed test",
-            MockTestRunner.wantedResults.get(0).getStatus(),
+            MockTestRunner.wantedResult.getStatus(),
             result.getStatus());
       
       Assert.assertNull(
@@ -89,7 +84,7 @@ public class ProtocolTestCase
       
       Assert.assertEquals(
             "Should have returned a passed test",
-            MockTestRunner.wantedResults.get(0).getStatus(),
+            MockTestRunner.wantedResult.getStatus(),
             result.getStatus());
       
       Assert.assertNotNull(

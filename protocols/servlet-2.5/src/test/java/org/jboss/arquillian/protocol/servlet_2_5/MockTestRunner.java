@@ -16,9 +16,6 @@
  */
 package org.jboss.arquillian.protocol.servlet_2_5;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunner;
 
@@ -32,16 +29,16 @@ import org.jboss.arquillian.spi.TestRunner;
  */
 public class MockTestRunner implements TestRunner
 {
-   public static List<TestResult> wantedResults = new ArrayList<TestResult>();
+   public static TestResult wantedResult = null;
    
    public static void add(TestResult wantedTestResult) 
    {
-      wantedResults.add(wantedTestResult);
+      wantedResult = wantedTestResult;
    }
    
    public TestResult execute(Class<?> testClass, String methodName)
    {
-      return wantedResults.get(0);
+      return wantedResult;
    }
    
 //   public void execute(TestResultCallback callback, Class<?>... classes) 
