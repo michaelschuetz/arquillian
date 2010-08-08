@@ -21,10 +21,15 @@ import java.util.Collection;
 import org.jboss.arquillian.spi.DeploymentPackager;
 import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ArchivePath;
+import org.jboss.shrinkwrap.api.ArchivePaths;
+import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptors;
+import org.jboss.shrinkwrap.descriptor.spec.web.WebAppDef;
 
 /**
  * ServletProtocolDeploymentPackager
@@ -66,7 +71,24 @@ public class ServletProtocolDeploymentPackager implements DeploymentPackager
 
    private Archive<?> handleArchive(WebArchive applicationArchive, Collection<Archive<?>> auxiliaryArchives, WebArchive protocol) 
    {
-      throw new IllegalArgumentException("The " + ServletProtocolDeploymentPackager.class.getSimpleName() + " can't merge web.xml files.");
+      ArchivePath webXmlPath = ArchivePaths.create("WEB-INF/web.xml");
+      if(applicationArchive.contains(webXmlPath))
+      {
+         WebAppDef applicationWebXml = Descriptors.create(
+               WebAppDef.class, 
+               applicationArchive.get(webXmlPath).getAsset().openStream());
+         
+         applicationWebXml.servlet(ServletTestRunner.class, "/Arquillian"); 
+         applicationArchive.setWebXML(applicationWebXml);
+         
+         applicationArchive.merge(protocol, Filters.exclude(".*web\\.xml.*"));
+      }
+      else 
+      {
+         applicationArchive.merge(protocol);
+      }
+      applicationArchive.addLibraries(auxiliaryArchives.toArray(new Archive<?>[0]));
+      return applicationArchive;
    }
 
    private Archive<?> handleArchive(JavaArchive applicationArchive, Collection<Archive<?>> auxiliaryArchives, WebArchive protocol) 

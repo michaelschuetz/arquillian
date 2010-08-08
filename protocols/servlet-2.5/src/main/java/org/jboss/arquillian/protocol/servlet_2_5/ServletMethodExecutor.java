@@ -52,7 +52,7 @@ public class ServletMethodExecutor implements ContainerMethodExecutor
 //                        "?outputMode=serializedObject&className=" + testClass.getName() + 
 //                        "&methodName=" + testMethodExecutor.getMethod().getName();
       
-      String url = baseURL.toExternalForm() + "arquillian-protocol/" +  
+      String url = baseURL.toExternalForm() + "arquillian-protocol/Arquillian" +  
                          "?outputMode=serializedObject&className=" + testClass.getName() + 
                           "&methodName=" + testMethodExecutor.getMethod().getName();
       
