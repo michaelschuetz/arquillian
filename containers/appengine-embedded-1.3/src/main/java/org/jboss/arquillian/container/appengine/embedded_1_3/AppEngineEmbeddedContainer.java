@@ -24,6 +24,9 @@ package org.jboss.arquillian.container.appengine.embedded_1_3;
 
 import java.io.File;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
@@ -47,6 +50,7 @@ import com.google.appengine.tools.development.DevAppServerFactory;
 public class AppEngineEmbeddedContainer implements DeployableContainer
 {
    public static final String HTTP_PROTOCOL = "http";
+
    private AppEngineEmbeddedConfiguration containerConfig;
    private DevAppServer server;
 
@@ -58,13 +62,27 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
    public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
    {
       ExplodedExporter exporter = archive.as(ExplodedExporter.class);
-      File appLocation = exporter.exportExploded(new File(System.getProperty("java.io.tmpdir")));
+      final File appLocation = exporter.exportExploded(
+            AccessController.doPrivileged(new PrivilegedAction<File>()
+            {
+               public File run()
+               {
+                  return new File(System.getProperty("java.io.tmpdir"));
+               }
+            })
+      );
       appLocation.deleteOnExit();
-      
+
       try
       {
-         DevAppServerFactory factory = new DevAppServerFactory();
-         server = factory.createDevAppServer(appLocation, containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
+         server = AccessController.doPrivileged(new PrivilegedExceptionAction<DevAppServer>()
+         {
+            public DevAppServer run() throws Exception
+            {
+               DevAppServerFactory factory = new DevAppServerFactory();
+               return factory.createDevAppServer(appLocation, containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
+            }
+         });
          Map properties = System.getProperties();
          //noinspection unchecked
          server.setServiceProperties(properties);
@@ -79,7 +97,8 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
       {
          return new ServletMethodExecutor(new URL(
                HTTP_PROTOCOL,
-               containerConfig.getBindAddress(), containerConfig.getBindHttpPort(),
+               containerConfig.getBindAddress(),
+               containerConfig.getBindHttpPort(),
                "/")
          );
       }
@@ -91,6 +110,9 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
 
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
+      if (server == null)
+         return;
+
       try
       {
          server.shutdown();
@@ -98,6 +120,10 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
       catch (Exception e)
       {
          throw new DeploymentException("Error shutting down AppEngine", e);
+      }
+      finally
+      {
+         server = null;
       }
    }
 

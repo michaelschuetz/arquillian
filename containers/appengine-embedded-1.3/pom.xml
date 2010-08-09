@@ -41,6 +41,11 @@
          <artifactId>appengine-tools-api</artifactId>
          <version>${version.appengine}</version>
       </dependency>
+      <dependency>
+         <groupId>com.google.appengine</groupId>
+         <artifactId>appengine-api-1.0-sdk</artifactId>
+         <version>${version.appengine}</version>
+      </dependency>
       <!-- dependency>
          <groupId>com.google.appengine</groupId>
          <artifactId>appengine-agent</artifactId>
@@ -94,7 +99,12 @@
          <scope>test</scope>
       </dependency>
 
-      <!-- Weld servlet required for testing CDI injections -->
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+          <version>2.5</version>
+         <scope>test</scope>
+      </dependency>
 
       <dependency>
          <groupId>org.glassfish.web</groupId>
