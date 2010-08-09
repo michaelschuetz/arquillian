@@ -54,6 +54,7 @@
         <module>openejb-embedded-3.1</module>
         <module>openwebbeans-embedded-1</module>
         <module>osgi-embedded-4.2</module>
+        <module>appengine-embedded-1.3</module>
       </modules>
     </profile>
 

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+   <parent>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-build</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <relativePath>../../build/pom.xml</relativePath>
+   </parent>
+
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>org.jboss.arquillian.container</groupId>
+   <artifactId>arquillian-appengine-embedded-1.3</artifactId>
+   <name>Arquillian Container AppEnging Embedded 1.3.x</name>
+   <description>AppEngine Embedded 1.3.x Container integration for the Arquillian project</description>
+
+   <properties>
+      <version.appengine>1.3.5</version.appengine>
+   </properties>
+
+   <repositories>
+       <repository>
+           <id>maven-gae-plugin</id>
+           <name>Maven-gae-plugin Repository</name>
+           <url>http://maven-gae-plugin.googlecode.com/svn/repository</url>
+          <layout>default</layout>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+       </repository>
+   </repositories>
+
+   <dependencies>
+
+      <!-- AppEngine -->
+
+      <dependency>
+         <groupId>com.google.appengine</groupId>
+         <artifactId>appengine-tools-api</artifactId>
+         <version>${version.appengine}</version>
+      </dependency>
+      <!-- dependency>
+         <groupId>com.google.appengine</groupId>
+         <artifactId>appengine-agent</artifactId>
+         <version>${version.appengine}</version>
+         <scope>test</scope>
+      </dependency -->
+
+      <!-- Arquillian -->
+      
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-spi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.protocol</groupId>
+         <artifactId>arquillian-protocol-servlet-3</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-cdi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-resource</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-junit</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.enterprise</groupId>
+         <artifactId>cdi-api</artifactId>
+         <version>1.0</version>
+         <scope>test</scope>
+      </dependency>
+
+      <!-- Weld servlet required for testing CDI injections -->
+
+      <dependency>
+         <groupId>org.glassfish.web</groupId>
+         <artifactId>el-impl</artifactId>
+         <version>2.2</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.servlet.jsp</groupId>
+         <artifactId>jsp-api</artifactId>
+         <version>2.2</version>
+         <scope>test</scope>
+      </dependency>
+
+   </dependencies>
+</project>
