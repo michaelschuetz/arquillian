@@ -39,8 +39,11 @@ import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ExplodedExporter;
 
+import com.google.appengine.tools.development.ApiProxyLocalFactory;
 import com.google.appengine.tools.development.DevAppServer;
 import com.google.appengine.tools.development.DevAppServerFactory;
+import com.google.appengine.tools.development.LocalEnvironment;
+import com.google.apphosting.api.ApiProxy;
 
 /**
  * Start AppEngine Embedded Container.
@@ -59,7 +62,7 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
       containerConfig = configuration.getContainerConfig(AppEngineEmbeddedConfiguration.class);
    }
 
-   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
+   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       ExplodedExporter exporter = archive.as(ExplodedExporter.class);
       final File appLocation = exporter.exportExploded(
@@ -93,6 +96,20 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
          throw new DeploymentException("Error starting AppEngine.", e);
       }
 
+      ApiProxy.Environment env = new DelegatingEnvironment(new DummyEnvironment())
+      {
+         @Override
+         public String getAppId()
+         {
+            return archive.getName();
+         }
+      };
+      ApiProxyLocalFactory aplf = new ApiProxyLocalFactory();
+      ApiProxy.Delegate delegate = aplf.create(new DummyLocalServerEnvironment(appLocation, containerConfig));
+
+      ApiProxy.setEnvironmentForCurrentThread(env);
+      ApiProxy.setDelegate(delegate);
+
       try
       {
          return new ServletMethodExecutor(new URL(
@@ -112,6 +129,10 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
    {
       if (server == null)
          return;
+
+      ApiProxy.setDelegate(null);
+      ApiProxy.clearEnvironmentForCurrentThread();
+      ApiProxy.setEnvironmentForCurrentThread(null);
 
       try
       {

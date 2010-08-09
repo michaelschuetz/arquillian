@@ -57,7 +57,7 @@ public class AppEngineEmbeddedClientTestCase
    @Deployment
    public static WebArchive getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "client-test.war")
+      final WebArchive war = ShrinkWrap.create(WebArchive.class, "simple.war")
             .addClass(TestServlet.class)
             .setWebXML("gae-web.xml")
             .addWebResource("appengine-web.xml")
