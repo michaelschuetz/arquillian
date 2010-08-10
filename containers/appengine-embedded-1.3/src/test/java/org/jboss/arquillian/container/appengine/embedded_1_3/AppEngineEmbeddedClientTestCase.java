@@ -25,7 +25,6 @@ package org.jboss.arquillian.container.appengine.embedded_1_3;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
@@ -34,9 +33,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,8 +44,6 @@ import org.junit.runner.RunWith;
 @Run(RunModeType.AS_CLIENT)
 public class AppEngineEmbeddedClientTestCase
 {
-   private static final Logger log = Logger.getLogger(AppEngineEmbeddedClientTestCase.class.getName());
-
    /**
     * Deployment for the test
     *
@@ -57,13 +52,11 @@ public class AppEngineEmbeddedClientTestCase
    @Deployment
    public static WebArchive getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "simple.war")
+      return ShrinkWrap.create(WebArchive.class, "simple.war")
             .addClass(TestServlet.class)
             .setWebXML("gae-web.xml")
             .addWebResource("appengine-web.xml")
             .addWebResource("logging.properties");
-      log.info(war.toString(true));
-      return war;
    }
 
    @Test

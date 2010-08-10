@@ -41,16 +41,6 @@
          <artifactId>appengine-tools-api</artifactId>
          <version>${version.appengine}</version>
       </dependency>
-      <dependency>
-         <groupId>com.google.appengine</groupId>
-         <artifactId>appengine-api-1.0-sdk</artifactId>
-         <version>${version.appengine}</version>
-      </dependency>
-      <dependency>
-         <groupId>com.google.appengine</groupId>
-         <artifactId>appengine-local-runtime</artifactId>
-         <version>${version.appengine}</version>
-      </dependency>
       <!-- dependency>
          <groupId>com.google.appengine</groupId>
          <artifactId>appengine-agent</artifactId>

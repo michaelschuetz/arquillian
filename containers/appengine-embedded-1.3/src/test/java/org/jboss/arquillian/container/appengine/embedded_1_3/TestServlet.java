@@ -24,6 +24,7 @@ package org.jboss.arquillian.container.appengine.embedded_1_3;
 
 import java.io.IOException;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ public class TestServlet extends HttpServlet
 {
    private static final long serialVersionUID = 1L;
 
-   public static final String URL_PATTERN = "/test";
+   public static final String URL_PATTERN = "/Test";
 
    public static final String MESSAGE = "hello";
 
