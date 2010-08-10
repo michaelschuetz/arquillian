@@ -23,12 +23,14 @@
 package org.jboss.arquillian.container.appengine.embedded_1_3;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 
+import org.jboss.arquillian.container.appengine.embedded_1_3.hack.AppEngineHack;
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
@@ -38,8 +40,8 @@ import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ExplodedExporter;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 
+import com.google.appengine.tools.development.AppContext;
 import com.google.appengine.tools.development.DevAppServer;
 import com.google.appengine.tools.development.DevAppServerFactory;
 
@@ -91,6 +93,8 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
          //noinspection unchecked
          server.setServiceProperties(properties);
          server.start();
+
+         setup("start");
       }
       catch (Exception e)
       {
@@ -112,10 +116,34 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
       }
    }
 
+   /**
+    * Hack with ApiProxy.
+    *
+    * @param methodName the method name
+    * @throws Exception for any error
+    */
+   private void setup(String methodName) throws Exception
+   {
+      AppContext appContext = server.getAppContext();
+      ClassLoader cl = appContext.getClassLoader();
+      Class<?> clazz = cl.loadClass(AppEngineHack.class.getName());
+      Method method = clazz.getMethod(methodName);
+      Object instance = clazz.newInstance();
+      method.invoke(instance);
+   }
+
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
       if (server == null)
          return;
+
+      try
+      {
+         setup("stop");
+      }
+      catch (Exception ignored)
+      {
+      }
 
       try
       {

@@ -25,6 +25,7 @@ package org.jboss.arquillian.container.appengine.embedded_1_3;
 import java.io.File;
 import java.util.logging.Logger;
 
+import org.jboss.arquillian.container.appengine.embedded_1_3.hack.AppEngineHack;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
@@ -46,7 +47,6 @@ class AppEngineSetup
 
    private static final String[] FILES = {
          "appengine-api-1.0-sdk",
-         "appengine-api-labs"
    };
 
    /**
@@ -60,6 +60,7 @@ class AppEngineSetup
 
       WebArchive webArchive = archive.as(WebArchive.class);
       webArchive.addLibraries(files);
+      webArchive.addClass(AppEngineHack.class); // hack
 
       log.info(webArchive.toString(true));
    }
