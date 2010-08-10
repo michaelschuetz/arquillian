@@ -27,8 +27,7 @@
   <modules>
     
     <module>jsfunit</module>
-<!--    <module>cobertura</module> -->
-
+    <module>jacoco</module>
   </modules>
 
 </project>
