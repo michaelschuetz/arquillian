@@ -62,8 +62,7 @@ public class AppEngineEmbeddedClientTestCase
    @Test
    public void shouldBeAbleToInvokeServletInDeployedWebApp() throws Exception
    {
-      String body = readAllAndClose(
-            new URL("http://localhost:8080/test" + TestServlet.URL_PATTERN).openStream());
+      String body = readAllAndClose(new URL("http://localhost:8080/test").openStream());
 
       Assert.assertEquals(
             "Verify that the servlet was deployed and returns expected result",
