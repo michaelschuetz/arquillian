@@ -94,7 +94,7 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
          server.setServiceProperties(properties);
          server.start();
 
-         setup("start");
+         setup("start", appLocation, containerConfig.getBindHttpPort(), containerConfig.getBindAddress());
       }
       catch (Exception e)
       {
@@ -120,16 +120,24 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
     * Hack with ApiProxy.
     *
     * @param methodName the method name
+    * @param args the arguments
     * @throws Exception for any error
     */
-   private void setup(String methodName) throws Exception
+   private void setup(String methodName, Object... args) throws Exception
    {
       AppContext appContext = server.getAppContext();
       ClassLoader cl = appContext.getClassLoader();
       Class<?> clazz = cl.loadClass(AppEngineHack.class.getName());
-      Method method = clazz.getMethod(methodName);
+      Class[] classes = new Class[0];
+      if (args != null && args.length > 0)
+      {
+         classes = new Class[args.length];
+         for (int i = 0; i < args.length; i++)
+            classes[i] = args.getClass();
+      }
+      Method method = clazz.getMethod(methodName, classes);
       Object instance = clazz.newInstance();
-      method.invoke(instance);
+      method.invoke(instance, args);
    }
 
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException

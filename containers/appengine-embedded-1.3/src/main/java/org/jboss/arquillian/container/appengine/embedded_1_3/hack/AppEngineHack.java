@@ -22,10 +22,12 @@
 
 package org.jboss.arquillian.container.appengine.embedded_1_3.hack;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.io.File;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.apphosting.api.ApiProxy;
 
@@ -36,56 +38,80 @@ import com.google.apphosting.api.ApiProxy;
  */
 public class AppEngineHack
 {
-   public void start()
+   public void start(final File appLocation, final int port, final String address) throws Exception
    {
-      ApiProxy.Delegate delegate = new ApiProxy.Delegate()
+      ApiProxy.setEnvironmentForCurrentThread(new ApiProxy.Environment()
       {
-         public byte[] makeSyncCall(ApiProxy.Environment environment, String s, String s1, byte[] bytes) throws ApiProxy.ApiProxyException
+         public String getAppId()
          {
-            return bytes;
+            return appLocation.getName();
          }
 
-         public Future<byte[]> makeAsyncCall(ApiProxy.Environment environment, String s, String s1, final byte[] bytes, ApiProxy.ApiConfig apiConfig)
+         public String getVersionId()
          {
-            return new Future<byte[]>()
-            {
-               public boolean cancel(boolean mayInterruptIfRunning)
-               {
-                  return false;
-               }
-
-               public boolean isCancelled()
-               {
-                  return false;
-               }
-
-               public boolean isDone()
-               {
-                  return true;
-               }
-
-               public byte[] get() throws InterruptedException, ExecutionException
-               {
-                  return bytes;
-               }
-
-               public byte[] get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
-               {
-                  return bytes;
-               }
-            };
+            return "1.0";
          }
 
-         public void log(ApiProxy.Environment environment, ApiProxy.LogRecord logRecord)
+         public String getEmail()
          {
-            System.out.println(logRecord.getMessage());
+            return null;
          }
-      };
+
+         public boolean isLoggedIn()
+         {
+            return false;
+         }
+
+         public boolean isAdmin()
+         {
+            return false;
+         }
+
+         public String getAuthDomain()
+         {
+            return "jboss.org";
+         }
+
+         public String getRequestNamespace()
+         {
+            return null;
+         }
+
+         public Map<String, Object> getAttributes()
+         {
+            return new ConcurrentHashMap<String, Object>();
+         }
+      });
+
+      ClassLoader serverCL = ApiProxy.class.getClassLoader();
+      Class<?> apfClass = serverCL.loadClass("com.google.appengine.tools.development.ApiProxyLocalFactory");
+      Class<?> envClass = serverCL.loadClass("com.google.appengine.tools.development.LocalServerEnvironment");
+      Method create = apfClass.getMethod("create", envClass);
+      Object target = Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{envClass}, new InvocationHandler()
+      {
+         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+         {
+            String name = method.getName();
+            if ("getAppDir".equals(name))
+               return appLocation;
+            else if ("getPort".equals(name))
+               return port;
+            else if ("getAddress".equals(name))
+               return address;
+            else if ("waitForServerToStart".equals(name))
+               return null;
+            else
+               throw new IllegalArgumentException("No such method supported: " + name);
+         }
+      });
+      Object result = create.invoke(apfClass.newInstance(), target);
+      ApiProxy.Delegate delegate = ApiProxy.Delegate.class.cast(result);
       ApiProxy.setDelegate(delegate);
    }
 
    public void stop()
    {
       ApiProxy.setDelegate(null);
+      ApiProxy.clearEnvironmentForCurrentThread();
    }
 }
