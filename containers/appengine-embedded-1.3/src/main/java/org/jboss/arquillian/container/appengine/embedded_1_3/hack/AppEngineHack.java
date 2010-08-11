@@ -38,7 +38,7 @@ import com.google.apphosting.api.ApiProxy;
  */
 public class AppEngineHack
 {
-   public void start(final File appLocation, final int port, final String address) throws Exception
+   public void start(final File appLocation, final Integer port, final String address) throws Exception
    {
       ApiProxy.setEnvironmentForCurrentThread(new ApiProxy.Environment()
       {
@@ -87,7 +87,7 @@ public class AppEngineHack
       Class<?> apfClass = serverCL.loadClass("com.google.appengine.tools.development.ApiProxyLocalFactory");
       Class<?> envClass = serverCL.loadClass("com.google.appengine.tools.development.LocalServerEnvironment");
       Method create = apfClass.getMethod("create", envClass);
-      Object target = Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{envClass}, new InvocationHandler()
+      Object target = Proxy.newProxyInstance(serverCL, new Class<?>[]{envClass}, new InvocationHandler()
       {
          public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
          {

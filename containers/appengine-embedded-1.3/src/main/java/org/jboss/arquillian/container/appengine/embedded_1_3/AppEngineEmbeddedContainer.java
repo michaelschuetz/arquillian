@@ -133,7 +133,7 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
       {
          classes = new Class[args.length];
          for (int i = 0; i < args.length; i++)
-            classes[i] = args.getClass();
+            classes[i] = args[i].getClass();
       }
       Method method = clazz.getMethod(methodName, classes);
       Object instance = clazz.newInstance();
