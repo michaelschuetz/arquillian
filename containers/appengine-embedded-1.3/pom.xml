@@ -50,7 +50,7 @@
          <artifactId>maven-surefire-plugin</artifactId>
          <configuration>
            <argLine>
-             -javaagent:{appengine.home}/lib/agent/appengine-agent.jar
+             -javaagent:${appengine.home}/lib/agent/appengine-agent.jar
            </argLine>
            <redirectTestOutputToFile>true</redirectTestOutputToFile>
            <trimStackTrace>false</trimStackTrace>
