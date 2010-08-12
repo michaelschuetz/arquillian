@@ -17,6 +17,7 @@
 
    <properties>
       <version.appengine>1.3.5</version.appengine>
+      <appengine.home>${user.home}/java_lib/appengine-java-sdk-1.3.5</appengine.home>
    </properties>
 
    <repositories>
@@ -31,6 +32,45 @@
           </releases>
        </repository>
    </repositories>
+
+   <build>
+    <pluginManagement>
+       <plugins>
+          <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-surefire-plugin</artifactId>
+             <version>${version.surefire.plugin}</version>
+          </plugin>
+       </plugins>
+    </pluginManagement>
+     <plugins>
+
+       <!-- Surefire -->
+       <plugin>
+         <artifactId>maven-surefire-plugin</artifactId>
+         <configuration>
+           <argLine>
+             -javaagent:{appengine.home}/lib/agent/appengine-agent.jar
+           </argLine>
+           <redirectTestOutputToFile>true</redirectTestOutputToFile>
+           <trimStackTrace>false</trimStackTrace>
+           <printSummary>true</printSummary>
+           <includes>
+             <include>**/*TestCase.java</include>
+             <include>**/*TestSuite.java</include>
+           </includes>
+           <useFile>true</useFile>
+           <systemProperties>
+             <property>
+               <name>appengine.sdk.root</name>
+               <value>${appengine.home}</value>
+             </property>
+           </systemProperties>
+         </configuration>
+       </plugin>
+
+     </plugins>
+   </build>
 
    <dependencies>
 
