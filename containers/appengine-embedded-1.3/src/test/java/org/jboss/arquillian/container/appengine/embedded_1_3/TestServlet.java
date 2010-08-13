@@ -24,7 +24,6 @@ package org.jboss.arquillian.container.appengine.embedded_1_3;
 
 import java.io.IOException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
