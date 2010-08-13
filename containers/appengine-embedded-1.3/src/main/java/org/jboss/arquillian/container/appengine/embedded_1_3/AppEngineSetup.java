@@ -54,7 +54,7 @@ class AppEngineSetup
     *
     * @param archive the current archive
     */
-   static void prepare(Archive archive)
+   static void prepare(Archive<?> archive)
    {
       File[] files = getFiles();
 

@@ -105,7 +105,7 @@ public class AppEngineHack
          }
       });
       Object result = create.invoke(apfClass.newInstance(), target);
-      ApiProxy.Delegate delegate = ApiProxy.Delegate.class.cast(result);
+      ApiProxy.Delegate<?> delegate = ApiProxy.Delegate.class.cast(result);
       ApiProxy.setDelegate(delegate);
    }
 

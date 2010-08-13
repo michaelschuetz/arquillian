@@ -27,10 +27,10 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 
 import org.jboss.arquillian.container.appengine.embedded_1_3.hack.AppEngineHack;
+import org.jboss.arquillian.container.appengine.embedded_1_3.hack.DevAppServerFactory;
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
@@ -43,7 +43,6 @@ import org.jboss.shrinkwrap.api.exporter.ExplodedExporter;
 
 import com.google.appengine.tools.development.AppContext;
 import com.google.appengine.tools.development.DevAppServer;
-import com.google.appengine.tools.development.DevAppServerFactory;
 
 /**
  * Start AppEngine Embedded Container.
@@ -60,6 +59,11 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
    public void setup(Context context, Configuration configuration)
    {
       containerConfig = configuration.getContainerConfig(AppEngineEmbeddedConfiguration.class);
+   }
+
+   public void start(Context context) throws LifecycleException
+   {
+      //AppEngineSetup.setupSecurityManagerIfNonPresent();
    }
 
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
@@ -81,14 +85,8 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
 
       try
       {
-         server = AccessController.doPrivileged(new PrivilegedExceptionAction<DevAppServer>()
-         {
-            public DevAppServer run() throws Exception
-            {
-               DevAppServerFactory factory = new DevAppServerFactory();
-               return factory.createDevAppServer(appLocation, containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
-            }
-         });
+         server = DevAppServerFactory.createDevAppServer(appLocation, containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
+
          Map properties = System.getProperties();
          //noinspection unchecked
          server.setServiceProperties(properties);
@@ -128,7 +126,7 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
       AppContext appContext = server.getAppContext();
       ClassLoader cl = appContext.getClassLoader();
       Class<?> clazz = cl.loadClass(AppEngineHack.class.getName());
-      Class[] classes = new Class[0];
+      Class<?>[] classes = new Class[0];
       if (args != null && args.length > 0)
       {
          classes = new Class[args.length];
@@ -165,10 +163,6 @@ public class AppEngineEmbeddedContainer implements DeployableContainer
       {
          server = null;
       }
-   }
-
-   public void start(Context context) throws LifecycleException
-   {
    }
 
    public void stop(Context context) throws LifecycleException
