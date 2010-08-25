@@ -47,8 +47,9 @@ public class AppEngineEmbeddedDeploymentAppender implements AuxiliaryArchiveAppe
                               ResourceInjectionEnricher.class.getPackage())
                         .addServiceProvider(
                               TestEnricher.class,
-                              CDIInjectionEnricher.class,
-                              ResourceInjectionEnricher.class);
+                              ServletCDIEnricher.class,
+                              ResourceInjectionEnricher.class)
+                        .addClass(ServletCDIEnricher.class);
       return archive;
    }
 }
