@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -35,6 +36,7 @@ import org.jboss.arquillian.spi.TestEnricher;
  */
 public class EJBInjectionEnricher implements TestEnricher
 {
+   private final Logger log = Logger.getLogger(EJBInjectionEnricher.class.getName());
    
    private static final String ANNOTATION_NAME = "javax.ejb.EJB";
    private static final String ANNOTATION_FIELD_BEAN_INTERFACE = "beanInterface";
@@ -159,7 +161,9 @@ public class EJBInjectionEnricher implements TestEnricher
             // no-op, try next
          }
       }
-      throw new NamingException("No EJB found in JNDI, tried the following names: " + joinJndiNames(jndiNames));
+      log.info("No EJB found in JNDI, tried the following names: " + joinJndiNames(jndiNames));
+      return null;
+      //throw new NamingException("No EJB found in JNDI, tried the following names: " + joinJndiNames(jndiNames));
    }
    
    protected InitialContext createContext(Context context) throws Exception
