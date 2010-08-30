@@ -23,6 +23,7 @@
 
   <!-- Aggregate Modules -->
   <modules>
+    <module>jboss-service</module>
     <module>performance</module>
   </modules>
 
