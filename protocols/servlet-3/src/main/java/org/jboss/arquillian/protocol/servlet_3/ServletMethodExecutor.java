@@ -34,12 +34,27 @@ import org.jboss.arquillian.spi.TestResult;
 public class ServletMethodExecutor implements ContainerMethodExecutor
 {
    private URL baseURL;
+   private String contextRoot;
    
    public ServletMethodExecutor(URL baseURL)
    {
-      this.baseURL = baseURL;
+      this(baseURL, "test");
    }
    
+   public ServletMethodExecutor(URL baseURL, String contextRoot)
+   {
+      this.baseURL = baseURL;
+      this.contextRoot = contextRoot;
+   }
+   
+   /**
+    * @return the baseURL
+    */
+   public URL getBaseURL()
+   {
+      return baseURL;
+   }
+
    public TestResult invoke(TestMethodExecutor testMethodExecutor) 
    {
       if(testMethodExecutor == null) 
@@ -48,7 +63,7 @@ public class ServletMethodExecutor implements ContainerMethodExecutor
       }
       
       Class<?> testClass = testMethodExecutor.getInstance().getClass();
-      String url = baseURL.toExternalForm() + "test/ArquillianServletRunner" +  
+      String url = baseURL.toExternalForm() + contextRoot + "/ArquillianServletRunner" +  
                         "?outputMode=serializedObject&className=" + testClass.getName() + 
                         "&methodName=" + testMethodExecutor.getMethod().getName();
       
