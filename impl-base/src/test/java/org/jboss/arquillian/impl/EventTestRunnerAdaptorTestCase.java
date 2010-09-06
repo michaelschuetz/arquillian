@@ -28,6 +28,7 @@ import org.jboss.arquillian.impl.context.TestContext;
 import org.jboss.arquillian.impl.event.FiredEventException;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeploymentException;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.ServiceLoader;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.event.suite.ClassEvent;
@@ -124,9 +125,9 @@ public class EventTestRunnerAdaptorTestCase
       
       adaptor.beforeSuite();
       adaptor.beforeClass(testClass);
-      adaptor.before(testInstance, testMethod);
+      adaptor.before(testInstance, testMethod, LifecycleMethodExecutor.NO_OP);
       adaptor.test(testExecutor);
-      adaptor.after(testInstance, testMethod);
+      adaptor.after(testInstance, testMethod, LifecycleMethodExecutor.NO_OP);
       adaptor.afterClass(testClass);
       adaptor.afterSuite();
       
@@ -281,7 +282,7 @@ public class EventTestRunnerAdaptorTestCase
       try
       {
          // BeforeClass throws Exception, simulate e.g. DeploymentException
-         adaptor.before(testInstance, testMethod);
+         adaptor.before(testInstance, testMethod, LifecycleMethodExecutor.NO_OP);
          Assert.fail("Before should have thrown exeption");
       }
       catch (FiredEventException e) 
@@ -292,7 +293,7 @@ public class EventTestRunnerAdaptorTestCase
             "verify ClassContext has been pushed to stack, even with exception",
             TestContext.class, adaptor.getActiveContext().getClass());      
 
-      adaptor.after(testInstance, testMethod);
+      adaptor.after(testInstance, testMethod, LifecycleMethodExecutor.NO_OP);
       Assert.assertEquals(
             "verify TestContext has been popped from stack, we're now at ClassContext",
             ClassContext.class, adaptor.getActiveContext().getClass());

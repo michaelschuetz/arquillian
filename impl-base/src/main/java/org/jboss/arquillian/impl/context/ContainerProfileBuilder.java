@@ -18,6 +18,8 @@ package org.jboss.arquillian.impl.context;
 
 import org.jboss.arquillian.impl.handler.TestCaseEnricher;
 import org.jboss.arquillian.impl.handler.TestEventExecuter;
+import org.jboss.arquillian.impl.handler.TestLifecycleMethodExecuter;
+import org.jboss.arquillian.spi.event.suite.After;
 import org.jboss.arquillian.spi.event.suite.Before;
 import org.jboss.arquillian.spi.event.suite.Test;
 
@@ -58,6 +60,8 @@ public class ContainerProfileBuilder implements ProfileBuilder
    public void buildTestContext(TestContext context, Object testInstance)
    {
       context.register(Before.class, new TestCaseEnricher());
+      context.register(Before.class, new TestLifecycleMethodExecuter());
       context.register(Test.class, new TestEventExecuter());
+      context.register(After.class, new TestLifecycleMethodExecuter());
    }
 }

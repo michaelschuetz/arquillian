@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2010, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,27 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.spi.event.suite;
-
-import java.lang.reflect.Method;
-
-import org.jboss.arquillian.spi.LifecycleMethodExecutor;
+package org.jboss.arquillian.spi;
 
 /**
- * Event fired After the Test method execution.
+ * Generic wrapper for invoking Lifecycle methods. <br/>
+ * <br/>
+ * Used to e.g. veto invocation of @Before/@After methods on the Client side.
  *
- * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
+ * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class After extends TestLifecycleEvent
+public interface LifecycleMethodExecutor
 {
-   /**
-    * @param testInstance The test case instance being tested
-    * @param testMethod The test method that was executed
-    * @param executor A call back when the LifecycleMethod represented by this event should be invoked
-    */
-   public After(Object testInstance, Method testMethod, LifecycleMethodExecutor executor)
+   public static final LifecycleMethodExecutor NO_OP = new LifecycleMethodExecutor()
    {
-      super(testInstance, testMethod, executor);
-   }
+      public void invoke() throws Throwable
+      {
+      }
+   };
+   
+   void invoke() throws Throwable;
+
 }

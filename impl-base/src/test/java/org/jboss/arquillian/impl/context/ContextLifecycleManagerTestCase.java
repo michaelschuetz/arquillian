@@ -23,6 +23,7 @@ import org.jboss.arquillian.impl.context.ContextLifecycleManager;
 import org.jboss.arquillian.impl.context.ProfileBuilder;
 import org.jboss.arquillian.impl.context.SuiteContext;
 import org.jboss.arquillian.impl.context.TestContext;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.ServiceLoader;
 import org.jboss.arquillian.spi.event.suite.Before;
 import org.jboss.arquillian.spi.event.suite.ClassEvent;
@@ -134,7 +135,7 @@ public class ContextLifecycleManagerTestCase
    @Test
    public void shouldBeAbleToFireUpwards() throws Exception 
    {
-      Before event = new Before(getClass(), getClass().getMethod("shouldBeAbleToFireUpwards"));
+      Before event = new Before(getClass(), getClass().getMethod("shouldBeAbleToFireUpwards"), LifecycleMethodExecutor.NO_OP);
       ContextLifecycleManager manager = new ContextLifecycleManager(profileBuilder, serviceLoader);
       
       SuiteContext suiteContext = manager.createRestoreSuiteContext();

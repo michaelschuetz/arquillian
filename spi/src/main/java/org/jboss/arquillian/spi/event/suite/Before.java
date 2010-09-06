@@ -18,20 +18,23 @@ package org.jboss.arquillian.spi.event.suite;
 
 import java.lang.reflect.Method;
 
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
+
 /**
  * Event fired Before the Test method execution
  *
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class Before extends TestEvent
+public class Before extends TestLifecycleEvent
 {
    /**
     * @param testInstance The test case instance being tested
     * @param testMethod The test method that is about to be executed
+    * @param executor A call back when the LifecycleMethod represented by this event should be invoked
     */
-   public Before(Object testInstance, Method testMethod)
+   public Before(Object testInstance, Method testMethod, LifecycleMethodExecutor executor)
    {
-      super(testInstance, testMethod);
+      super(testInstance, testMethod, executor);
    }
 }

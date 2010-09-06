@@ -22,6 +22,7 @@ import java.util.Stack;
 import org.jboss.arquillian.impl.context.ContextLifecycleManager;
 import org.jboss.arquillian.impl.context.TestContext;
 import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
@@ -116,28 +117,35 @@ public class EventTestRunnerAdaptor implements TestRunnerAdaptor
       }
    }
 
-   public void before(Object testInstance, Method testMethod) throws Exception
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.TestRunnerAdaptor#before(java.lang.Object, java.lang.reflect.Method, org.jboss.arquillian.spi.LifecycleMethodExecutor)
+    */
+   public void before(Object testInstance, Method testMethod, LifecycleMethodExecutor executor) throws Exception
    {
       Validate.notNull(testInstance, "TestInstance must be specified");
       Validate.notNull(testMethod, "TestMethod must be specified");
+      Validate.notNull(executor, "LifeCycleMethodExecutor must be specified");
       
       TestContext testContext = contextLifecycle.createRestoreTestContext(testInstance);
       try
       {
-         testContext.fire(new Before(testInstance, testMethod));
+         testContext.fire(new Before(testInstance, testMethod, executor));
       }
       finally
       {
          activeContext.push(testContext);
       }
    }
-
-   public void after(Object testInstance, Method testMethod) throws Exception
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.TestRunnerAdaptor#after(java.lang.Object, java.lang.reflect.Method, org.jboss.arquillian.spi.LifecycleMethodExecutor)
+    */
+   public void after(Object testInstance, Method testMethod, LifecycleMethodExecutor executor) throws Exception
    {
       Validate.notNull(testInstance, "TestInstance must be specified");
       Validate.notNull(testMethod, "TestMethod must be specified");
 
-      contextLifecycle.createRestoreTestContext(testInstance).fire(new After(testInstance, testMethod));
+      contextLifecycle.createRestoreTestContext(testInstance).fire(new After(testInstance, testMethod, executor));
       try
       {
          contextLifecycle.destroyTestContext(testInstance);

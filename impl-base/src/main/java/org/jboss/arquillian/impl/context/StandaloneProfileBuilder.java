@@ -18,6 +18,8 @@ package org.jboss.arquillian.impl.context;
 
 import org.jboss.arquillian.impl.handler.ContainerTestExecuter;
 import org.jboss.arquillian.impl.handler.TestCaseEnricher;
+import org.jboss.arquillian.impl.handler.TestLifecycleMethodExecuter;
+import org.jboss.arquillian.spi.event.suite.After;
 import org.jboss.arquillian.spi.event.suite.Before;
 import org.jboss.arquillian.spi.event.suite.Test;
 
@@ -29,6 +31,17 @@ import org.jboss.arquillian.spi.event.suite.Test;
  */
 public class StandaloneProfileBuilder extends ClientProfileBuilder
 {
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.impl.context.ClientProfileBuilder#buildSuiteContext(org.jboss.arquillian.impl.context.SuiteContext)
+    */
+   @Override
+   public void buildSuiteContext(SuiteContext context)
+   {
+      super.buildSuiteContext(context);
+      context.register(Before.class, new TestLifecycleMethodExecuter());
+      context.register(After.class, new TestLifecycleMethodExecuter());
+   }
+   
    /* (non-Javadoc)
     * @see org.jboss.arquillian.impl.context.ProfileBuilder#buildTestContext(org.jboss.arquillian.impl.context.TestContext)
     */

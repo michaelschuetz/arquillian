@@ -63,16 +63,18 @@ public interface TestRunnerAdaptor
    /**
     * @param testInstance
     * @param testMethod
+    * @param executor
     * @throws Exception
     */
-   void before(Object testInstance, Method testMethod) throws Exception;
+   void before(Object testInstance, Method testMethod, LifecycleMethodExecutor executor) throws Exception;
    
    /**
     * @param testInstance
     * @param testMethod
+    * @param executor
     * @throws Exception
     */
-   void after(Object testInstance, Method testMethod) throws Exception;
+   void after(Object testInstance, Method testMethod, LifecycleMethodExecutor executor) throws Exception;
 
    /**
     * @param testMethodExecutor

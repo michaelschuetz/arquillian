@@ -24,6 +24,8 @@ import junit.framework.Assert;
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
@@ -47,7 +49,9 @@ public class JUnitIntegrationTestCase
       containerCallbacks.put("stop", 0);
       containerCallbacks.put("deploy", 0);
       containerCallbacks.put("undeploy", 0);
+      containerCallbacks.put("before", 0);
       containerCallbacks.put("shouldBeInvoked", 0);
+      containerCallbacks.put("after", 0);
    }
    
    public static void wasCalled(String name) 
@@ -115,6 +119,18 @@ public class JUnitIntegrationTestCase
       public static JavaArchive create() 
       {
          return ShrinkWrap.create(JavaArchive.class, "test.jar");
+      }
+      
+      @Before
+      public void before() 
+      {
+         JUnitIntegrationTestCase.wasCalled("before");
+      }
+
+      @After
+      public void after() 
+      {
+         JUnitIntegrationTestCase.wasCalled("after");
       }
       
       @Test

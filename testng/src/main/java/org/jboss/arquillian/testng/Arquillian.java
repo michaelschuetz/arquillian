@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import org.jboss.arquillian.impl.DeployableTestBuilder;
 import org.jboss.arquillian.impl.XmlConfigurationBuilder;
 import org.jboss.arquillian.spi.Configuration;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
@@ -86,13 +87,13 @@ public abstract class Arquillian implements IHookable
    @BeforeMethod(alwaysRun = true)
    public void arquillianBeforeTest(Method testMethod) throws Exception 
    {
-      deployableTest.get().before(this, testMethod);
+      deployableTest.get().before(this, testMethod, LifecycleMethodExecutor.NO_OP);
    }
 
    @AfterMethod(alwaysRun = true)
    public void arquillianAfterTest(Method testMethod) throws Exception 
    {
-      deployableTest.get().after(this, testMethod);
+      deployableTest.get().after(this, testMethod, LifecycleMethodExecutor.NO_OP);
    }
 
    public void run(final IHookCallBack callback, final ITestResult testResult)

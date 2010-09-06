@@ -25,6 +25,7 @@ import java.util.List;
 import org.jboss.arquillian.impl.DeployableTestBuilder;
 import org.jboss.arquillian.impl.XmlConfigurationBuilder;
 import org.jboss.arquillian.spi.Configuration;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
@@ -81,8 +82,7 @@ public class Arquillian extends BlockJUnit4ClassRunner
             {
                 throw new RuntimeException("Arquillian has previously been attempted initialized, but failed. See previous exceptions for cause.");
             }
-            Configuration configuration = new XmlConfigurationBuilder().build();
-            TestRunnerAdaptor adaptor = DeployableTestBuilder.build(configuration);
+            TestRunnerAdaptor adaptor = createTestRunnerAdaptor();
             try 
             {
                // don't set it if beforeSuite fails
@@ -99,6 +99,13 @@ public class Arquillian extends BlockJUnit4ClassRunner
       {
          lastCreatedRunner.set(this);
       }
+   }
+
+   protected TestRunnerAdaptor createTestRunnerAdaptor()
+   {
+      Configuration configuration = new XmlConfigurationBuilder().build();
+      TestRunnerAdaptor adaptor = DeployableTestBuilder.build(configuration);
+      return adaptor;
    }
    
    @Override
@@ -203,8 +210,19 @@ public class Arquillian extends BlockJUnit4ClassRunner
          @Override
          public void evaluate() throws Throwable
          {
-            deployableTest.get().before(target, method.getMethod());
-            statementWithBefores.evaluate();
+            final Callback before = new Callback();
+            deployableTest.get().before(target, method.getMethod(), new LifecycleMethodExecutor()
+            {
+               public void invoke() throws Throwable
+               {
+                  before.called();
+                  statementWithBefores.evaluate();            
+               }
+            });
+            if(!before.wasCalled()) 
+            {
+               originalStatement.evaluate();
+            }
          }
       };
    }
@@ -218,17 +236,19 @@ public class Arquillian extends BlockJUnit4ClassRunner
          @Override
          public void evaluate() throws Throwable
          {
-            new MultiStatementExecutor().execute
-            (
-                  new Statement() { public void evaluate() throws Throwable 
-                  {
-                     statementWithAfters.evaluate();
-                  }},
-                  new Statement() { public void evaluate() throws Throwable 
-                  {
-                     deployableTest.get().after(target, method.getMethod());
-                  }}
-            );
+            final Callback after = new Callback();
+            deployableTest.get().after(target, method.getMethod(), new LifecycleMethodExecutor()
+            {
+               public void invoke() throws Throwable
+               {
+                  after.called();
+                  statementWithAfters.evaluate();               
+               }
+            });
+            if(!after.wasCalled()) 
+            {
+               originalStatement.evaluate();
+            }
          }
       };
    }
@@ -312,4 +332,20 @@ public class Arquillian extends BlockJUnit4ClassRunner
          throw new MultipleFailureException(exceptions);
       }
    }
+   
+   private class Callback {
+      
+      private boolean wasCalled = false;
+      
+      public boolean wasCalled() 
+      {
+         return wasCalled;
+      }
+      
+      public void called() 
+      {
+         wasCalled = true;
+      }
+   }
+
 }
