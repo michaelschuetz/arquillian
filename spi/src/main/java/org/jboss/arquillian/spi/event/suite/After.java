@@ -30,6 +30,15 @@ public class After extends TestLifecycleEvent
 {
    /**
     * @param testInstance The test case instance being tested
+    * @param testMethod The test method that is about to be executed
+    */
+   public After(Object testInstance, Method testMethod)
+   {
+      super(testInstance, testMethod);
+   }
+
+   /**
+    * @param testInstance The test case instance being tested
     * @param testMethod The test method that was executed
     * @param executor A call back when the LifecycleMethod represented by this event should be invoked
     */

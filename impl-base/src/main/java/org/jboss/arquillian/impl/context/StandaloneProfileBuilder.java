@@ -20,7 +20,9 @@ import org.jboss.arquillian.impl.handler.ContainerTestExecuter;
 import org.jboss.arquillian.impl.handler.TestCaseEnricher;
 import org.jboss.arquillian.impl.handler.TestLifecycleMethodExecuter;
 import org.jboss.arquillian.spi.event.suite.After;
+import org.jboss.arquillian.spi.event.suite.AfterClass;
 import org.jboss.arquillian.spi.event.suite.Before;
+import org.jboss.arquillian.spi.event.suite.BeforeClass;
 import org.jboss.arquillian.spi.event.suite.Test;
 
 /**
@@ -38,8 +40,18 @@ public class StandaloneProfileBuilder extends ClientProfileBuilder
    public void buildSuiteContext(SuiteContext context)
    {
       super.buildSuiteContext(context);
-      context.register(Before.class, new TestLifecycleMethodExecuter());
-      context.register(After.class, new TestLifecycleMethodExecuter());
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.impl.context.ClientProfileBuilder#buildClassContext(org.jboss.arquillian.impl.context.ClassContext, java.lang.Class)
+    */
+   @Override
+   public void buildClassContext(ClassContext context, Class<?> testClass)
+   {
+      super.buildClassContext(context, testClass);
+      
+      context.register(BeforeClass.class, new TestLifecycleMethodExecuter());
+      context.register(AfterClass.class, new TestLifecycleMethodExecuter());
    }
    
    /* (non-Javadoc)
@@ -49,6 +61,8 @@ public class StandaloneProfileBuilder extends ClientProfileBuilder
    public void buildTestContext(TestContext context, Object testInstance)
    {
       context.register(Before.class, new TestCaseEnricher());
+      context.register(Before.class, new TestLifecycleMethodExecuter());
       context.register(Test.class, new ContainerTestExecuter());
+      context.register(After.class, new TestLifecycleMethodExecuter());
    }
 }

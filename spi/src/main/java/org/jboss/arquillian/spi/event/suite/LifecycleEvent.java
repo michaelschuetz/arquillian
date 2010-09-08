@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2010, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -17,29 +17,20 @@
 package org.jboss.arquillian.spi.event.suite;
 
 import org.jboss.arquillian.spi.LifecycleMethodExecutor;
+import org.jboss.arquillian.spi.event.Event;
 
 /**
- * Event fired After the Class execution.
+ * Describes a Event with the capability of Vetoing the execution of a method. 
  *
- * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
+ * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class AfterClass extends ClassLifecycleEvent
+public interface LifecycleEvent extends Event
 {
    /**
-    * @param testClass The source for this AfterClass event
+    * Get the call back handler for this lifecycle method.
+    * @return the executor
     */
-   public AfterClass(Class<?> testClass)
-   {
-      super(testClass);
-   }
-
-   /**
-    * @param testClass The source for this AfterClass event
-    * @param executor A call back when the LifecycleMethod represented by this event should be invoked
-    */
-   public AfterClass(Class<?> testClass, LifecycleMethodExecutor executor)
-   {
-      super(testClass, executor);
-   }
+   LifecycleMethodExecutor getExecutor();
+   
 }

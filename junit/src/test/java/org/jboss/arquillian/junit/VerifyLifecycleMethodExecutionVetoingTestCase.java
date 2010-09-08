@@ -28,12 +28,15 @@ import org.jboss.arquillian.impl.context.SuiteContext;
 import org.jboss.arquillian.impl.context.TestContext;
 import org.jboss.arquillian.impl.handler.TestEventExecuter;
 import org.jboss.arquillian.impl.handler.TestLifecycleMethodExecuter;
+import org.jboss.arquillian.spi.ClassContextAppender;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestContextAppender;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
@@ -59,23 +62,37 @@ public class VerifyLifecycleMethodExecutionVetoingTestCase
    @Test
    public void shouldCallBeforeAfterIfHandlersAreActive() throws Exception
    {
+      containerCallbacks.put("beforeClass", 0);
       containerCallbacks.put("before", 0);
       containerCallbacks.put("test", 0);
       containerCallbacks.put("after", 0);
+      containerCallbacks.put("afterClass", 0);
       
-      runArquillianTest(new TestContextAppender()
-      {
-         public void append(Context context)
-         {
-            context.register(org.jboss.arquillian.spi.event.suite.Before.class, new TestLifecycleMethodExecuter());
-            context.register(org.jboss.arquillian.spi.event.suite.Test.class, new TestEventExecuter());
-            context.register(org.jboss.arquillian.spi.event.suite.After.class, new TestLifecycleMethodExecuter());
-         }
-      });
+      runArquillianTest(
+            new TestContextAppender()
+            {
+               public void append(Context context)
+               {
+                  context.register(org.jboss.arquillian.spi.event.suite.Before.class, new TestLifecycleMethodExecuter());
+                  context.register(org.jboss.arquillian.spi.event.suite.Test.class, new TestEventExecuter());
+                  context.register(org.jboss.arquillian.spi.event.suite.After.class, new TestLifecycleMethodExecuter());
+               }
+            },
+            new ClassContextAppender()
+            {
+               public void append(Context context)
+               {
+                  context.register(org.jboss.arquillian.spi.event.suite.BeforeClass.class, new TestLifecycleMethodExecuter());
+                  context.register(org.jboss.arquillian.spi.event.suite.AfterClass.class, new TestLifecycleMethodExecuter());
+               }
+            }
+      );
 
+      assertCallback("beforeClass", 1);
       assertCallback("before", 1);
       assertCallback("test", 1);
       assertCallback("after", 1);
+      assertCallback("afterClass", 1);
    }
    
    /*
@@ -85,24 +102,36 @@ public class VerifyLifecycleMethodExecutionVetoingTestCase
    @Test
    public void shouldCallTestIfBeforeAfterHandlersAreNotActive() throws Exception
    {
+      containerCallbacks.put("beforeClass", 0);
       containerCallbacks.put("before", 0);
       containerCallbacks.put("test", 0);
       containerCallbacks.put("after", 0);
+      containerCallbacks.put("afterClass", 0);
       
-      runArquillianTest(new TestContextAppender()
-      {
-         public void append(Context context)
-         {
-            context.register(org.jboss.arquillian.spi.event.suite.Test.class, new TestEventExecuter());
-         }
-      });
+      runArquillianTest(
+            new TestContextAppender()
+            {
+               public void append(Context context)
+               {
+                  context.register(org.jboss.arquillian.spi.event.suite.Test.class, new TestEventExecuter());
+               }
+            },
+            new ClassContextAppender()
+            {
+               public void append(Context context)
+               {
+               }
+            }
+      );
       
+      assertCallback("beforeClass", 0);
       assertCallback("before", 0);
       assertCallback("test", 1);
       assertCallback("after", 0);
+      assertCallback("afterClass", 0);
    }
 
-   protected void runArquillianTest(final TestContextAppender contextAppender) throws InitializationError
+   protected void runArquillianTest(final TestContextAppender testContextAppender, final ClassContextAppender classContextAppender) throws InitializationError
    {
       RunNotifier notifier = new RunNotifier();
       Result testResult = new Result();
@@ -115,14 +144,17 @@ public class VerifyLifecycleMethodExecutionVetoingTestCase
             Configuration configuration = new Configuration();
             return DeployableTestBuilder.build(new ProfileBuilder()
             {
-               public void buildTestContext(TestContext context, Object testInstance)
-               {
-                  contextAppender.append(context);
+               public void buildSuiteContext(SuiteContext context) {}
+
+               public void buildClassContext(ClassContext context, Class<?> testClass) 
+               { 
+                  classContextAppender.append(context);
                }
                
-               public void buildSuiteContext(SuiteContext context) {}
-               
-               public void buildClassContext(ClassContext context, Class<?> testClass) { }
+               public void buildTestContext(TestContext context, Object testInstance)
+               {
+                  testContextAppender.append(context);
+               }
             }, 
             configuration);
          }
@@ -139,6 +171,18 @@ public class VerifyLifecycleMethodExecutionVetoingTestCase
    
    public static class BeforeAfterTestClass 
    {
+      @BeforeClass
+      public static void beforeClass()
+      {
+         wasCalled("beforeClass");
+      }
+      
+      @AfterClass
+      public static void afterClass()
+      {
+         wasCalled("afterClass");
+      }
+
       @Before
       public void before() 
       {

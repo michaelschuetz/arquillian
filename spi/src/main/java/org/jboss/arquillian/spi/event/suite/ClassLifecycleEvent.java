@@ -16,45 +16,67 @@
  */
 package org.jboss.arquillian.spi.event.suite;
 
-import java.lang.reflect.Method;
-
 import org.jboss.arquillian.spi.LifecycleMethodExecutor;
+import org.jboss.arquillian.spi.TestClass;
 
 /**
- * A TestLifeCycleEvent is a type of TestEvent used for e.g. @Before/@After operations on the
- * Test instance.
+ * A ClassLifeCycleEvent is a type of ClassEvent used for e.g. @BeforeClass/@AfterClass operations on the
+ * TestClass.
  *
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class TestLifecycleEvent extends TestEvent implements LifecycleEvent
+public class ClassLifecycleEvent extends ClassEvent implements LifecycleEvent
 {
    private LifecycleMethodExecutor executor;
-
+   
    /**
-    * Create a new TestLifecycleEvent for a specific testInstance executing a specific testMethod. <br/>
+    * Create a new ClassLifecycleEvent for a specific Class. <br/>
     * <br/>
     * This will use a NO_OP LifecycleMethodExecutor. 
- 
-    * @param testInstance The Test instance
-    * @param testMethod The Test Method being executed
-    * @param executor A call back when the LifecycleMethod represented by this event should be invoked
+    *  
+    * @param testClass The source for this ClassEvent
     */
-   public TestLifecycleEvent(Object testInstance, Method testMethod)
+   public ClassLifecycleEvent(Class<?> testClass)
    {
-      this(testInstance, testMethod, LifecycleMethodExecutor.NO_OP);
+      this(testClass, LifecycleMethodExecutor.NO_OP);
    }
    
    /**
-    * Create a new TestLifecycleEvent for a specific testInstance executing a specific testMethod. <br/>
-    * 
-    * @param testInstance The Test instance
-    * @param testMethod The Test Method being executed
+    * Create a new ClassLifecycleEvent for a specific Class. <br/>
+    * <br/>
+    * This will use a NO_OP LifecycleMethodExecutor. 
+    *  
+    * @param testClass The source for this ClassEvent
+    */
+   public ClassLifecycleEvent(TestClass testClass)
+   {
+      this(testClass, LifecycleMethodExecutor.NO_OP);
+   }
+   
+   /**
+    * Create a new ClassLifecycleEvent for a specific Class. <br/>
+    *  
+    * @param testClass The source for this ClassEvent
     * @param executor A call back when the LifecycleMethod represented by this event should be invoked
     */
-   public TestLifecycleEvent(Object testInstance, Method testMethod, LifecycleMethodExecutor executor)
+   public ClassLifecycleEvent(Class<?> testClass, LifecycleMethodExecutor executor)
    {
-      super(testInstance, testMethod);  
+      super(testClass);  
+      
+      Validate.notNull(executor, "LifecycleMethodExecutor must be specified");
+      this.executor = executor;
+   }
+
+   /**
+    * Create a new ClassLifecycleEvent for a specific Class. <br/>
+    *  
+    * @param testClass The source for this ClassEvent
+    * @param executor A call back when the LifecycleMethod represented by this event should be invoked
+    */
+   public ClassLifecycleEvent(TestClass testClass, LifecycleMethodExecutor executor)
+   {
+      super(testClass);  
       
       Validate.notNull(executor, "LifecycleMethodExecutor must be specified");
       this.executor = executor;

@@ -75,13 +75,13 @@ public abstract class Arquillian implements IHookable
    @BeforeClass(alwaysRun = true)
    public void arquillianBeforeClass() throws Exception
    {
-      deployableTest.get().beforeClass(getClass());
+      deployableTest.get().beforeClass(getClass(), LifecycleMethodExecutor.NO_OP);
    }
 
    @AfterClass(alwaysRun = true)
    public void arquillianAfterClass() throws Exception
    {
-      deployableTest.get().afterClass(getClass());
+      deployableTest.get().afterClass(getClass(), LifecycleMethodExecutor.NO_OP);
    }
    
    @BeforeMethod(alwaysRun = true)

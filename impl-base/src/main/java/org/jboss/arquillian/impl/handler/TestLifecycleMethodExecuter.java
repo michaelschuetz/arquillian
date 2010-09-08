@@ -18,7 +18,7 @@ package org.jboss.arquillian.impl.handler;
 
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.event.suite.EventHandler;
-import org.jboss.arquillian.spi.event.suite.TestLifecycleEvent;
+import org.jboss.arquillian.spi.event.suite.LifecycleEvent;
 
 /**
  * TestLifecycleMethodHandler
@@ -26,13 +26,13 @@ import org.jboss.arquillian.spi.event.suite.TestLifecycleEvent;
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class TestLifecycleMethodExecuter implements EventHandler<TestLifecycleEvent>
+public class TestLifecycleMethodExecuter implements EventHandler<LifecycleEvent>
 {
 
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.event.suite.EventHandler#callback(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
-   public void callback(Context context, TestLifecycleEvent event) throws Exception
+   public void callback(Context context, LifecycleEvent event) throws Exception
    {
       try
       { 

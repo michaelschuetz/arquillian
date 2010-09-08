@@ -134,14 +134,6 @@ public class Arquillian extends BlockJUnit4ClassRunner
       super.run(notifier);
    }
 
-   @Override
-   // TODO: exclude @Integration test classes
-   protected List<FrameworkMethod> computeTestMethods()
-   {
-      return super.computeTestMethods();
-   }
-
-
    /**
     * Override to allow test methods with arguments
     */
@@ -164,14 +156,18 @@ public class Arquillian extends BlockJUnit4ClassRunner
          @Override
          public void evaluate() throws Throwable
          {
-            try
+            final Callback before = new Callback();
+            deployableTest.get().beforeClass(Arquillian.this.getTestClass().getJavaClass(), new LifecycleMethodExecutor()
             {
-               deployableTest.get().beforeClass(Arquillian.this.getTestClass().getJavaClass());
-               statementWithBefores.evaluate();
-            } 
-            catch (Exception e) // catch and rethrow only to be able to set a break point. 
+               public void invoke() throws Throwable
+               {
+                  before.called();
+                  statementWithBefores.evaluate(); 
+               }
+            });
+            if(!before.wasCalled()) 
             {
-               throw e;
+               originalStatement.evaluate();
             }
          }
       };
@@ -186,17 +182,19 @@ public class Arquillian extends BlockJUnit4ClassRunner
          @Override
          public void evaluate() throws Throwable
          {
-            new MultiStatementExecutor().execute
-            (
-                  new Statement() { public void evaluate() throws Throwable
-                  {
-                     statementWithAfters.evaluate();
-                  }},
-                  new Statement() { public void evaluate() throws Throwable 
-                  {
-                     deployableTest.get().afterClass(Arquillian.this.getTestClass().getJavaClass());
-                  }}
-            );
+            final Callback before = new Callback();
+            deployableTest.get().afterClass(Arquillian.this.getTestClass().getJavaClass(), new LifecycleMethodExecutor()
+            {
+               public void invoke() throws Throwable
+               {
+                  before.called();
+                  statementWithAfters.evaluate();            
+               }
+            });
+            if(!before.wasCalled()) 
+            {
+               originalStatement.evaluate();
+            }
          }
       };
    }

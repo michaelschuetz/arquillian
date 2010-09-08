@@ -124,11 +124,11 @@ public class EventTestRunnerAdaptorTestCase
       Mockito.when(testExecutor.getMethod()).thenReturn(testMethod);
       
       adaptor.beforeSuite();
-      adaptor.beforeClass(testClass);
+      adaptor.beforeClass(testClass, LifecycleMethodExecutor.NO_OP);
       adaptor.before(testInstance, testMethod, LifecycleMethodExecutor.NO_OP);
       adaptor.test(testExecutor);
       adaptor.after(testInstance, testMethod, LifecycleMethodExecutor.NO_OP);
-      adaptor.afterClass(testClass);
+      adaptor.afterClass(testClass, LifecycleMethodExecutor.NO_OP);
       adaptor.afterSuite();
       
       Mockito.verify(suiteEventHandler, Mockito.times(2))
@@ -220,7 +220,7 @@ public class EventTestRunnerAdaptorTestCase
       try
       {
          // BeforeClass throws Exception, simulate e.g. DeploymentException
-         adaptor.beforeClass(testClass);
+         adaptor.beforeClass(testClass, LifecycleMethodExecutor.NO_OP);
          Assert.fail("BeforeClass should have thrown exeption");
       }
       catch (FiredEventException e) 
@@ -230,7 +230,7 @@ public class EventTestRunnerAdaptorTestCase
             "verify ClassContext has been pushed to stack, even with exception",
             ClassContext.class, adaptor.getActiveContext().getClass());      
 
-      adaptor.afterClass(testClass);
+      adaptor.afterClass(testClass, LifecycleMethodExecutor.NO_OP);
       Assert.assertEquals(
             "verify ClassContext has been popped from stack, we're now at SuiteContext",
             SuiteContext.class, adaptor.getActiveContext().getClass());
@@ -274,7 +274,7 @@ public class EventTestRunnerAdaptorTestCase
             "verify SuiteContext has been pushed to stack",
             SuiteContext.class, adaptor.getActiveContext().getClass());
       
-      adaptor.beforeClass(testClass);
+      adaptor.beforeClass(testClass, LifecycleMethodExecutor.NO_OP);
       Assert.assertEquals(
             "verify ClassContext has been pushed to stack",
             ClassContext.class, adaptor.getActiveContext().getClass());
@@ -299,7 +299,7 @@ public class EventTestRunnerAdaptorTestCase
             ClassContext.class, adaptor.getActiveContext().getClass());
       
       
-      adaptor.afterClass(testClass);
+      adaptor.afterClass(testClass, LifecycleMethodExecutor.NO_OP);
       Assert.assertEquals(
             "verify ClassContext has been popped from stack, we're now at SuiteContext",
             SuiteContext.class, adaptor.getActiveContext().getClass());

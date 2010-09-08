@@ -23,6 +23,7 @@ import junit.framework.Assert;
 import org.jboss.arquillian.impl.context.ClassContext;
 import org.jboss.arquillian.impl.context.SuiteContext;
 import org.jboss.arquillian.spi.Configuration;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.ServiceLoader;
 import org.jboss.arquillian.spi.event.suite.BeforeClass;
 import org.jboss.shrinkwrap.api.Archive;
@@ -55,7 +56,7 @@ public class ArchiveDeploymentExporterTestCase
       ClassContext context = new ClassContext(new SuiteContext(serviceLoader));
       
       ArchiveDeploymentExporter handler = new ArchiveDeploymentExporter();
-      handler.callback(context, new BeforeClass(getClass()));
+      handler.callback(context, new BeforeClass(getClass(), LifecycleMethodExecutor.NO_OP));
       
       fileShouldExist(false);
    }
