@@ -25,6 +25,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 /**
@@ -33,7 +34,8 @@ import org.testng.annotations.Test;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class RandomTestCase extends Arquillian {
+@Listeners(Arquillian.class)
+public class RandomTestCase {
 
 	@Deployment
 	public static JavaArchive createDeployment() {

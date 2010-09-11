@@ -1,4 +1,5 @@
 /*
+
  * JBoss, Home of Professional Open Source
  * Copyright 2009, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
@@ -22,13 +23,15 @@ import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 /**
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class SynchronousPaymentProcessorTestCase extends Arquillian {
+@Listeners(Arquillian.class)
+public class SynchronousPaymentProcessorTestCase {
 
 	@Deployment
 	public static JavaArchive createDeployment() {

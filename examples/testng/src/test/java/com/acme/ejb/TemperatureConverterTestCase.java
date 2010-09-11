@@ -7,10 +7,12 @@ import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 @Test(groups = "integration")
-public class TemperatureConverterTestCase extends Arquillian {
+@Listeners(Arquillian.class)
+public class TemperatureConverterTestCase {
 
    @EJB
    private TemperatureConverter converter;

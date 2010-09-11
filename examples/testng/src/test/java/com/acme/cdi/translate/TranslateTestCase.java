@@ -25,9 +25,11 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-public class TranslateTestCase extends Arquillian {
+@Listeners(Arquillian.class)
+public class TranslateTestCase {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
