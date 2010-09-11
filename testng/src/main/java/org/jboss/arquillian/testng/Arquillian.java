@@ -26,8 +26,11 @@ import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
 import org.jboss.arquillian.spi.util.TestEnrichers;
+import org.testng.IConfigurable;
+import org.testng.IConfigureCallBack;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -38,19 +41,70 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 
 /**
- * Arquillian
+ * Arquillian TestNG integration entry point. Register this as a listener on the TestClass using the @Listener
+ * annotation for in the suite xml file. Will call into Arquillian in the appropriate lifecycle methods.
  *
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public abstract class Arquillian implements IHookable
+public abstract class Arquillian implements IHookable, IConfigurable
 {
    public static final String ARQUILLIAN_DATA_PROVIDER = "ARQUILLIAN_DATA_PROVIDER";
    
    private static ThreadLocal<TestRunnerAdaptor> deployableTest = new ThreadLocal<TestRunnerAdaptor>();
 
-   @BeforeSuite(alwaysRun = true)
-   public void arquillianBeforeSuite() throws Exception
+   /**
+    * Based on the Configuration Annotation used on the current method, we call back Arquillian
+    * in the correct lifecycle. Not all TestNG configuration methods are currently supported. 
+    */
+   /* (non-Javadoc)
+    * @see org.testng.IConfigurable#run(org.testng.IConfigureCallBack, org.testng.ITestResult)
+    */
+   public void run(IConfigureCallBack callBack, ITestResult testResult)
+   {
+      try
+      {
+         ITestNGMethod currentMethod = testResult.getMethod();
+         if(currentMethod.isBeforeSuiteConfiguration())
+         {
+            arquillianBeforeSuite(callBack, testResult);
+         }
+         else if(currentMethod.isAfterSuiteConfiguration())
+         {
+            arquillianAfterSuite(callBack, testResult);
+         }
+         else if(currentMethod.isBeforeClassConfiguration())
+         {
+            arquillianBeforeClass(callBack, testResult);
+         }
+         else if(currentMethod.isAfterClassConfiguration())
+         {
+            arquillianAfterClass(callBack, testResult);
+         }
+         else if(currentMethod.isBeforeMethodConfiguration())
+         {
+            arquillianBeforeTest(callBack, testResult);
+         }
+         else if(currentMethod.isAfterMethodConfiguration())
+         {
+            arquillianAfterTest(callBack, testResult);
+         }
+         else
+         {
+            throw new RuntimeException(
+                  "Unknown Configuration annotation used, Arquillian does not know how to handle " +
+                  "found annotations " + testResult.getMethod().getMethod().getAnnotations() + 
+                  " on " + testResult.getMethod().getMethod() + ". "  +
+                  "Supported annotations are " + getSupportedConfigurationMethods() + ".");
+         }
+      } 
+      catch (Exception e) 
+      {
+         throw new RuntimeException(e);
+      }
+   }
+   
+   protected void arquillianBeforeSuite(IConfigureCallBack callBack, ITestResult testResult) throws Exception
    {
       if(deployableTest.get() == null)
       {
@@ -61,8 +115,7 @@ public abstract class Arquillian implements IHookable
       }
    }
 
-   @AfterSuite(alwaysRun = true)
-   public void arquillianAfterSuite() throws Exception
+   protected void arquillianAfterSuite(IConfigureCallBack callBack, ITestResult testResult) throws Exception
    {
       if (deployableTest.get() == null) 
       {
@@ -72,28 +125,35 @@ public abstract class Arquillian implements IHookable
       deployableTest.set(null);
    }
 
-   @BeforeClass(alwaysRun = true)
-   public void arquillianBeforeClass() throws Exception
+   protected void arquillianBeforeClass(IConfigureCallBack callBack, ITestResult testResult) throws Exception
    {
-      deployableTest.get().beforeClass(getClass(), LifecycleMethodExecutor.NO_OP);
+      deployableTest.get().beforeClass(
+            testResult.getTestClass().getRealClass(), 
+            new ConfigurationLifecycleMethodExecuter(callBack, testResult));
    }
 
-   @AfterClass(alwaysRun = true)
-   public void arquillianAfterClass() throws Exception
+   protected void arquillianAfterClass(IConfigureCallBack callBack, ITestResult testResult) throws Exception
    {
-      deployableTest.get().afterClass(getClass(), LifecycleMethodExecutor.NO_OP);
+      deployableTest.get().afterClass(
+            testResult.getTestClass().getRealClass(), 
+            new ConfigurationLifecycleMethodExecuter(callBack, testResult));
    }
    
-   @BeforeMethod(alwaysRun = true)
-   public void arquillianBeforeTest(Method testMethod) throws Exception 
+   protected void arquillianBeforeTest(IConfigureCallBack callBack, ITestResult testResult) throws Exception 
    {
-      deployableTest.get().before(this, testMethod, LifecycleMethodExecutor.NO_OP);
+      deployableTest.get().before(
+            testResult.getInstance(), 
+            testResult.getMethod().getMethod(),  // not the TestMethod
+            new ConfigurationLifecycleMethodExecuter(callBack, testResult));
    }
 
-   @AfterMethod(alwaysRun = true)
-   public void arquillianAfterTest(Method testMethod) throws Exception 
+   protected void arquillianAfterTest(IConfigureCallBack callBack, ITestResult testResult) throws Exception 
    {
-      deployableTest.get().after(this, testMethod, LifecycleMethodExecutor.NO_OP);
+      deployableTest.get().after(            
+            testResult.getInstance(), 
+            testResult.getMethod().getMethod(), // not the TestMethod
+            new ConfigurationLifecycleMethodExecuter(callBack, testResult));
+
    }
 
    public void run(final IHookCallBack callback, final ITestResult testResult)
@@ -101,48 +161,12 @@ public abstract class Arquillian implements IHookable
       TestResult result;
       try
       {
-         result = deployableTest.get().test(new TestMethodExecutor()
-         {
-            public void invoke() throws Throwable
-            {
-               callback.runTestMethod(testResult);
+         result = deployableTest.get().test(new TestMethodExecuter(callback, testResult));
                
-               clearParameters(testResult);
-            }
-
-            private void clearParameters(final ITestResult testResult)
-            {
-               // clear parameters. they can be contextual and might fail TestNG during the report writing.
-               Object[] parameters = testResult.getParameters();
-               for(int i = 0; parameters != null && i < parameters.length; i++)
-               {
-                  Object parameter = parameters[i];
-                  if(parameter != null)
-                  {
-                     parameters[i] = parameter.getClass().getName();
-                  }
-                  else
-                  {
-                     parameters[i] = "null";
-                  }
-               }
-            }
-            
-            public Method getMethod()
-            {
-               return testResult.getMethod().getMethod();
-            }
-            
-            public Object getInstance()
-            {
-               return Arquillian.this;
-            }
-         });
          if(result.getThrowable() != null)
          {
             testResult.setThrowable(result.getThrowable());
          }
-
          // calculate test end time. this is overwritten in the testng invoker.. 
          testResult.setEndMillis( (result.getStart() - result.getEnd()) + testResult.getStartMillis());
       } 
@@ -166,5 +190,95 @@ public abstract class Arquillian implements IHookable
       values[0] = parameterValues; 
       
       return values;
+   }
+   
+   /**
+    * Helper to write out the supported Configuration methods for TestNG.
+    * 
+    * @return All Supported Configuration annotations.
+    */
+   private String getSupportedConfigurationMethods() 
+   {
+      return "@" + BeforeSuite.class.getSimpleName() + " " + 
+             "@" + AfterSuite.class.getSimpleName() + " " +
+             "@" + BeforeClass.class.getSimpleName() + " " +
+             "@" + AfterClass.class.getSimpleName() + " " +
+             "@" + BeforeMethod.class.getSimpleName() + " " +
+             "@" + AfterMethod.class.getSimpleName();
+   }
+   
+   private static class TestMethodExecuter implements TestMethodExecutor
+   {
+      private IHookCallBack callBack;
+      private ITestResult testResult;
+
+      public TestMethodExecuter(IHookCallBack callBack, ITestResult testResult)
+      {
+         this.callBack = callBack;
+         this.testResult = testResult;
+      }
+      
+      /* (non-Javadoc)
+       * @see org.jboss.arquillian.spi.TestMethodExecutor#getInstance()
+       */
+      public Object getInstance()
+      {
+         return testResult.getInstance();
+      }
+      
+      /* (non-Javadoc)
+       * @see org.jboss.arquillian.spi.TestMethodExecutor#getMethod()
+       */
+      public Method getMethod()
+      {
+         return testResult.getMethod().getMethod();
+      }
+      
+      /* (non-Javadoc)
+       * @see org.jboss.arquillian.spi.LifecycleMethodExecutor#invoke()
+       */
+      public void invoke() throws Throwable
+      {
+         callBack.runTestMethod(testResult);
+         clearParameters(testResult);
+      }
+
+      private void clearParameters(final ITestResult testResult)
+      {
+         // clear parameters. they can be contextual and might fail TestNG during the report writing.
+         Object[] parameters = testResult.getParameters();
+         for(int i = 0; parameters != null && i < parameters.length; i++)
+         {
+            Object parameter = parameters[i];
+            if(parameter != null)
+            {
+               parameters[i] = parameter.getClass().getName();
+            }
+            else
+            {
+               parameters[i] = "null";
+            }
+         }
+      }
+   }
+   
+   private static class ConfigurationLifecycleMethodExecuter implements LifecycleMethodExecutor
+   {
+      private IConfigureCallBack callBack;
+      private ITestResult testResult;
+      
+      public ConfigurationLifecycleMethodExecuter(IConfigureCallBack callBack, ITestResult testResult)
+      {
+         this.callBack = callBack;
+         this.testResult = testResult;
+      }
+      
+      /* (non-Javadoc)
+       * @see org.jboss.arquillian.spi.LifecycleMethodExecutor#invoke()
+       */
+      public void invoke() throws Throwable
+      {
+         callBack.runConfigurationMethod(testResult);
+      }
    }
 }

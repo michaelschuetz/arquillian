@@ -39,7 +39,7 @@
     <version.mockito_all>1.8.3</version.mockito_all>
     <version.osgi>4.2.0</version.osgi>
     <version.shrinkwrap_shrinkwrap>1.0.0-alpha-11</version.shrinkwrap_shrinkwrap>
-    <version.testng_testng>5.12.1</version.testng_testng>
+    <version.testng_testng>5.14.1-SNAPSHOT</version.testng_testng>
 
   </properties>
 
