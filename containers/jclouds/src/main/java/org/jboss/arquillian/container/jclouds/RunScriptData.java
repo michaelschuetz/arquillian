@@ -67,12 +67,9 @@ public class RunScriptData {
          .toString();
 
    public static final String YUM_RUN_SCRIPT = new StringBuilder()
-         .append("echo nameserver 208.67.222.222 >> /etc/resolv.conf\n")
-         //
-         .append("echo \"[jdkrepo]\" >> /etc/yum.repos.d/CentOS-Base.repo\n")
-         //
-         .append("echo \"name=jdkrepository\" >> /etc/yum.repos.d/CentOS-Base.repo\n")
-         //
+         .append("echo nameserver 208.67.222.222 >> /etc/resolv.conf\n") //
+         .append("echo \"[jdkrepo]\" >> /etc/yum.repos.d/CentOS-Base.repo\n") //
+         .append("echo \"name=jdkrepository\" >> /etc/yum.repos.d/CentOS-Base.repo\n") //
          .append(
                "echo \"baseurl=http://ec2-us-east-mirror.rightscale.com/epel/5/i386/\" >> /etc/yum.repos.d/CentOS-Base.repo\n")//
          .append("echo \"enabled=1\" >> /etc/yum.repos.d/CentOS-Base.repo\n")//

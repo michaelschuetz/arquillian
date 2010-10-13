@@ -23,6 +23,7 @@ import org.jboss.arquillian.container.jclouds.pool.ObjectPool.UsedObjectStrategy
 import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
 
+
 /**
  * JCloudsConfiguration
  *

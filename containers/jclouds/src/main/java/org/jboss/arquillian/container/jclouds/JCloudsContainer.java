@@ -181,7 +181,6 @@ public class JCloudsContainer implements DeployableContainer
       try
       {
          String publicAddress = nodeMetadata.getPublicAddresses().iterator().next();
-
          return new ServletMethodExecutor(new URL("http", publicAddress, config.getRemoteServerHttpPort(), "/"));
       }
       catch (Exception e)
@@ -234,5 +233,5 @@ public class JCloudsContainer implements DeployableContainer
 
       computeContext.close();
       System.out.println("stop: " + (System.currentTimeMillis() - start));
-   }
+  }
 }
