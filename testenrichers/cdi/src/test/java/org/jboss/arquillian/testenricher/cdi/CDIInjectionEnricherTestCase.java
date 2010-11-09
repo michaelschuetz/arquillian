@@ -18,7 +18,6 @@ import javax.inject.Inject;
 
 import junit.framework.Assert;
 
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.testenricher.cdi.beans.Cat;
 import org.jboss.arquillian.testenricher.cdi.beans.CatService;
 import org.jboss.arquillian.testenricher.cdi.beans.Dog;
@@ -59,8 +58,7 @@ public class CDIInjectionEnricherTestCase
 
       enricher = new CDIInjectionEnricher() 
       {
-         @Override
-         protected BeanManager lookupBeanManager(Context context)
+         protected BeanManager lookupBeanManager()
          {
             return manager;
          }
@@ -77,7 +75,7 @@ public class CDIInjectionEnricherTestCase
    public void shouldInjectClassMembers() throws Exception
    {
       TestClass testClass = new TestClass();
-      enricher.injectClass(null, testClass);
+      enricher.injectClass(testClass);
       testClass.testMethod(testClass.dogService, testClass.catService);
    }
    
@@ -86,7 +84,7 @@ public class CDIInjectionEnricherTestCase
    {
       Method testMethod = TestClass.class.getMethod("testMethod", Service.class, Service.class);
       
-      Object[] resolvedBeans = enricher.resolve(null, testMethod);
+      Object[] resolvedBeans = enricher.resolve(testMethod);
 
       TestClass testClass = new TestClass();
       testMethod.invoke(testClass, resolvedBeans);
@@ -97,7 +95,7 @@ public class CDIInjectionEnricherTestCase
    {
       Method testMethod = TestClass.class.getMethod("testEvent", Event.class, Event.class);
       
-      Object[] resolvedBeans = enricher.resolve(null, testMethod);
+      Object[] resolvedBeans = enricher.resolve(testMethod);
 
       TestClass testClass = new TestClass();
       testMethod.invoke(testClass, resolvedBeans);
@@ -108,7 +106,7 @@ public class CDIInjectionEnricherTestCase
    {
       Method testMethod = TestClass.class.getMethod("testInstance", Instance.class, Instance.class);
       
-      Object[] resolvedBeans = enricher.resolve(null, testMethod);
+      Object[] resolvedBeans = enricher.resolve(testMethod);
 
       TestClass testClass = new TestClass();
       testMethod.invoke(testClass, resolvedBeans);
