@@ -27,6 +27,7 @@
   <modules>
     
     <module>jsfunit</module>
+	<module>seam2</module>
 <!--    <module>cobertura</module> -->
 
   </modules>
